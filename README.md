@@ -1,0 +1,1 @@
+# MaiBot-Curfew-Plugin

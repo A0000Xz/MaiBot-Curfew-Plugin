@@ -29,13 +29,21 @@
 ![QQ_1750503979167](https://github.com/user-attachments/assets/1b031182-b884-4bec-b047-c0358bdc969d)
 
 总之，目前可用的便捷指令有：
+
 /curfew true  开启宵禁机制
+
 /curfew false 关闭宵禁机制，同时即刻解除全体禁言
+
 /curfew time list 列出当前设置的宵禁时间段
+
 /curfew start_time set 23:00 将宵禁开始时间设置为23:00（注：不能填24:00，因为定义其实是0:00，不过这么填说不定会有小彩蛋呢）
+
 /curfew end_time set 6:00 将宵禁开始时间设置为6:00（注：标准的填写应当是06:00，但是你这么填也不会引发错误。）
+
 /curfew permission_group list 列出所有插件会生效的群聊名单
+
 /curfew permission_group add 123456789 将群号为123456789的群加入到插件会生效的群聊配置里
+
 /curfew permission_group remove 123456789 将群号为123456789的群聊从插件会生效的群聊配置中移除
 
 目前就这些内容了

@@ -1,8 +1,8 @@
 {
   "manifest_version": 1,
-  "name": "curfew_plugin",
-  "version": "0.6.0",
-  "description": "宵禁插件，在机器人是QQ群聊管理员的情况下实现了自动宵禁功能",
+  "name": "宵禁插件",
+  "version": "0.8.0",
+  "description": "在机器人是QQ群聊管理员的情况下实现了自动宵禁功能",
   "author": {
     "name": "A肆零西烛",
     "url": "https://github.com/A0000Xz"

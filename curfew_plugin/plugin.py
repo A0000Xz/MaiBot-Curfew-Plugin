@@ -1,6 +1,6 @@
 import asyncio
 import toml
-import tomlkit
+import tomlkit # type: ignore
 import os
 import re
 from datetime import datetime
@@ -432,7 +432,7 @@ class CurfewPlugin(BasePlugin):
     # 配置Schema定义
     config_schema = {
         "plugin": {
-            "config_version": ConfigField(type=str, default="0.6.0", description="插件配置文件版本号"),
+            "config_version": ConfigField(type=str, default="0.8.0", description="插件配置文件版本号"),
             "enabled": ConfigField(type=bool, default=True, description="是否启用插件"),
         },
         "components": {

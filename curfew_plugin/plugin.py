@@ -52,11 +52,11 @@ class CurfewCommand(BaseCommand):
                 target_id = group.group_id  # 是群聊就把id设置为QQ群号
 
             if not self._check_group_permission(target) and not group == None: # 检查在不在生效群聊里，当然，必须是群聊环境，但也能透传私聊
-                return False,""
+                return False,"", True
 
             if group == None and (operation_type == "true" or operation_type == "false"):
                 await self.send_message("抱歉，私聊情况下，'true'或者'false'参数都是被禁用的",sender.user_id,False) # 做一个提醒，告诉私聊的人用不了/curfew true或者false
-                return False,""
+                return False,"", True
             
             if not self._check_person_permission(sender.user_id): # 检查个人权限，不是管理用户就直接截断命令
                 await self.send_message(
@@ -64,7 +64,7 @@ class CurfewCommand(BaseCommand):
                     target_id,
                     isgroup
                 )
-                return False,""
+                return False,"", True
         
             # 使用字典映射替代长串if-elif判断
             operation_map = {
@@ -78,7 +78,7 @@ class CurfewCommand(BaseCommand):
             
             if operation_type in operation_map:
                 await operation_map[operation_type]()
-                return True, ""
+                return True, "", True
             else:
                 await self.send_message(
                     "别乱填参数啊，可以用的有'true'，'false'，'time'，'start_time'，'end_time'，'permission_group'", 
@@ -86,17 +86,17 @@ class CurfewCommand(BaseCommand):
                     isgroup
                 )
                 logger.error(f"{self.log_prefix} 参数错误")
-                return False, ""
+                return False, "", True
             
         except Exception as e:
             logger.error(f"{self.log_prefix} 执行错误: {e}")
-            return False, f"执行失败: {str(e)}"
+            return False, f"执行失败: {str(e)}", True
 
     async def _handle_disable(self, group_id: str) -> Tuple[bool, str]:
         """处理禁用宵禁"""
         await self._stop_curfew_task(group_id)
         await self._apply_curfew_state(False, self._load_config(), send_message=False)
-        return True, ""
+        return True
 
     async def _handle_time_list(self, group_id: str, action_type: str, isgroup:bool = True) -> Tuple[bool, str]:
         """列出权限组列表"""
@@ -106,24 +106,24 @@ class CurfewCommand(BaseCommand):
             end_time = config["curfew"].get("end_time", "6:00")
             await self.send_message(f"当前设置的宵禁时间是{start_time}~{end_time}哦", group_id, isgroup)
             logger.info(f"{self.log_prefix} 已列出宵禁时段")
-            return True, ""
+            return True
         else:
             await self.send_message(f"{action_type}不是可用的参数，目前只有'list'这一个参数哦", group_id, isgroup)
-            return False, ""
+            return False
 
     async def _handle_time_config(self, operation_type, action_type: str, value: str, group_id: str, isgroup:bool = True) -> Tuple[bool, str]:
         """处理时间配置"""
         if action_type != "set":
             await self.send_message(f"{action_type}不是可用的参数，目前只有'set'这一个参数哦", group_id, isgroup)
-            return False, ""
+            return False
         
         if value == None:
             await self.send_message("别什么都不填啊，这里填时间啊", group_id, isgroup)
-            return False, ""
+            return False
 
         if not re.match(r"^([01]?[0-9]|2[0-3]):([0-5][0-9])$", value) and not value == "24:00":
             await self.send_message(f"{value}不是可用的参数，要填0:00到23:59之间这种格式的参数哦", group_id, isgroup)
-            return False, ""
+            return False
         
         # 处理24:00特殊情况
         if value == "24:00":
@@ -135,7 +135,7 @@ class CurfewCommand(BaseCommand):
         message = f"不能识别24:00哦，已经给你改好了，将{set_text}变更为{value}" if value == "00:00" else f"已将{set_text}变更为{value}"
         await self.send_message(message, group_id, isgroup)
         logger.info(f"{self.log_prefix} 已将{set_text}变更为{value}")
-        return True, ""
+        return True
 
     async def _handle_permission_group(self, action_type: str, value: str, group_id: str, isgroup:bool = True) -> Tuple[bool, str]:
         """处理权限组配置"""
@@ -150,33 +150,33 @@ class CurfewCommand(BaseCommand):
             return await handler(group_id, value, isgroup)
         else:
             await self.send_message(f"{action_type}不是可用的参数，目前只有'add','remove','list'三个参数哦", group_id, isgroup)
-            return False, ""
+            return False
 
     async def _handle_group_add(self, group_id: str, value: str, isgroup:bool = True) -> Tuple[bool, str]:
         """添加群组到权限列表"""
         if value == None:
             await self.send_message("别什么都不填啊，这里填群号啊", group_id, isgroup)
-            return False, ""
+            return False
         
         if not re.match(r"^[1-9]\d{4,10}$", value):
             await self.send_message(f"不对，你确定{value}是一个群号吗？", group_id, isgroup)
-            return False, ""
+            return False
         
         await self.set_config("permission_group", "add", value, group_id, isgroup)
-        return True, ""
+        return True
 
     async def _handle_group_remove(self, group_id: str, value: str, isgroup:bool = True) -> Tuple[bool, str]:
         """从权限列表移除群组"""
         if value == None:
             await self.send_message("别什么都不填啊，这里填群号啊", group_id, isgroup)
-            return False, ""
+            return False
         
         if not re.match(r"^[1-9]\d{4,10}$", value):
             await self.send_message(f"不对，你确定{value}是一个群号吗？", group_id, isgroup)
-            return False, ""
+            return False
         
         await self.set_config("permission_group", "remove", value, group_id, isgroup)
-        return True, ""
+        return True
 
     async def _handle_group_list(self, group_id: str, value: str, isgroup:bool = True) -> Tuple[bool, str]:
         """列出权限组列表"""
@@ -185,7 +185,7 @@ class CurfewCommand(BaseCommand):
         result = "宵禁插件生效的QQ群列表：\n" + "\n".join(allowed_groups)
         await self.send_message(result, group_id, isgroup)
         logger.info(f"{self.log_prefix} 已列出所有生效群聊")
-        return True, ""
+        return True
 
     def _check_group_permission(self, group_id: str) -> bool:
         """权限检查逻辑"""
@@ -435,7 +435,7 @@ class CurfewPlugin(BasePlugin):
     # 配置Schema定义
     config_schema = {
         "plugin": {
-            "config_version": ConfigField(type=str, default="0.9.0", description="插件配置文件版本号"),
+            "config_version": ConfigField(type=str, default="1.3.0", description="插件配置文件版本号"),
             "enabled": ConfigField(type=bool, default=True, description="是否启用插件"),
         },
         "components": {

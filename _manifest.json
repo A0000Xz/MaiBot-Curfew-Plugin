@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "name": "宵禁插件",
-  "version": "1.3.0",
+  "version": "1.4.6",
   "description": "在机器人是QQ群聊管理员的情况下实现了自动宵禁功能",
   "author": {
     "name": "A肆零西烛",
@@ -10,7 +10,7 @@
   "license": "GPL-v3.0-or-later",
   "host_application": {
     "min_version": "0.9.1",
-    "max_version": "0.9.1"
+    "max_version": "0.11.0"
   },
   "keywords": ["mute", "moderation", "admin", "management", "group", "curfew"],
   "categories": ["Moderation", "Group Management", "Admin Tools"],
